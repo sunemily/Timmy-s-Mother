@@ -41,47 +41,60 @@ void setup() {
 }
 
 void loop() {
-  uint8_t i;
+  //uint8_t i;
   
   Serial.print("tick");
 
-  myMotor->run(FORWARD);
-  myOtherMotor->run(FORWARD);
-  for (i=155; i<255; i++) {
-    myMotor->setSpeed(i); 
-    myOtherMotor->setSpeed(i); 
-    delay(100);
-  }
-  for (i=255; i!=155; i--) {
-    myMotor->setSpeed(i);  
-    myOtherMotor->setSpeed(i); 
-    delay(100);
-  }
-  
+  //for (i=155; i<255; i++) {
+   // myMotor->setSpeed(i); 
+   // myOtherMotor->setSpeed(i); 
+    //delay(100);
+  //}
+  //for (i=255; i!=155; i--) {
+   // myMotor->setSpeed(i);  
+   // myOtherMotor->setSpeed(i); 
+   // delay(100);
+ // }
+  turnToAngle(90);
+  delay(1000);
+  turnToAngle(-90);
+  delay(1000);
   Serial.print("tock");
 
-  myMotor->run(BACKWARD);
-  myOtherMotor->run(BACKWARD);
-  for (i=155; i<255; i++) {
-    myMotor->setSpeed(i);  
-    myOtherMotor->setSpeed(i);
-    delay(100);
-  }
-  for (i=255; i!=155; i--) {
-    myMotor->setSpeed(i);  
-    myOtherMotor->setSpeed(i);
-    delay(100);
-  }
+  //myMotor->run(BACKWARD);
+  //myOtherMotor->run(BACKWARD);
+  //for (i=155; i<255; i++) {
+   // myMotor->setSpeed(i);  
+   // myOtherMotor->setSpeed(i);
+   // delay(100);
+  //}
+  //for (i=255; i!=155; i--) {
+  //  myMotor->setSpeed(i);  
+   // myOtherMotor->setSpeed(i);
+   // delay(100);
+  //}
 
   Serial.print("tech");
-  myMotor->run(RELEASE);
-  myOtherMotor->run(RELEASE);
+  //myMotor->run(RELEASE);
+  //myOtherMotor->run(RELEASE);
   delay(1000);
 }
 void turnToAngle(int angle)
 {
+  if (angle > 0)
+  {
+    myMotor->run(BACKWARD);
+    myOtherMotor->run(FORWARD);
+  }
+  else
+  {
+    myMotor->run(FORWARD);
+    myOtherMotor->run(BACKWARD);
+  }
   myMotor->setSpeed(255);
-  myOtherMotor->setSpeed(-255);
-  delay(1000 * 11 /(6*4*51) * angle);
+  myOtherMotor->setSpeed(255);
+  delay(10.5 * abs(angle));
+  myMotor->setSpeed(0);
+  myOtherMotor->setSpeed(0);
 }
 
