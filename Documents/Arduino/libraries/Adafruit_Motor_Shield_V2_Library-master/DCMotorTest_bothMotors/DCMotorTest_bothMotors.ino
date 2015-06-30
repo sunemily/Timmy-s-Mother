@@ -78,3 +78,10 @@ void loop() {
   myOtherMotor->run(RELEASE);
   delay(1000);
 }
+void turnToAngle(int angle)
+{
+  myMotor->setSpeed(255);
+  myOtherMotor->setSpeed(-255);
+  delay(1000 * 11 /(6*4*51) * angle);
+}
+
