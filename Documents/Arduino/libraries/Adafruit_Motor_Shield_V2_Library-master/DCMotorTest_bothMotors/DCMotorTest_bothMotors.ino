@@ -1,18 +1,9 @@
 #include <Adafruit_MotorShield.h>
-
-
-/* 
-This is a test sketch for the Adafruit assembled Motor Shield for Arduino v2
-It won't work with v1.x motor shields! Only for the v2's with built in PWM
-control
-
-For use with the Adafruit Motor Shield v2 
----->  http://www.adafruit.com/products/1438
-*/
-
 #include <Wire.h>
-//#include < Adafruit_MotorShield.h >
 #include "utility/Adafruit_PWMServoDriver.h"
+
+#define trigPin 11
+#define echoPin 13
 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
@@ -26,7 +17,10 @@ Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(3);
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
-  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
+
+  //Ultrasonic
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 
   AFMS.begin();  // create with the default frequency 1.6KHz
   //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
@@ -46,54 +40,85 @@ void setup() {
 void loop() {
   //uint8_t i;
   
-  Serial.print("tick");
+  //Ultrasonic
+  long duration, distance;
+  
 
-  //for (i=155; i<255; i++) {
-   // myMotor->setSpeed(i); 
-   // myOtherMotor->setSpeed(i); 
-    //delay(100);
-  //}
-  //for (i=255; i!=155; i--) {
-   // myMotor->setSpeed(i);  
-   // myOtherMotor->setSpeed(i); 
-   // delay(100);
- // }
+  digitalWrite(trigPin, LOW);  
+  delayMicroseconds(2); 
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10); 
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration/2) / 29.1;
+
+  Serial.print(distance);
+  Serial.println(" cm");
+
+    if (distance < 25) { 
+      turnToAngle(90);
+    } else {
+      myMotor->run(BACKWARD);
+      myMotor->setSpeed(255);
+      myOtherMotor->run(BACKWARD);
+      myOtherMotor->setSpeed(255);
+    }
+
+/** Motor ramp test 
+
+  for (i=155; i<255; i++) {
+    myMotor->setSpeed(i); 
+    myOtherMotor->setSpeed(i); 
+    delay(100);
+  }
+  for (i=255; i!=155; i--) {
+    myMotor->setSpeed(i);  
+    myOtherMotor->setSpeed(i); 
+    delay(100);
+  }
+  
+
+  myMotor->run(BACKWARD);
+  myOtherMotor->run(BACKWARD);
+  
+  for (i=155; i<255; i++) {
+    myMotor->setSpeed(i);  
+    myOtherMotor->setSpeed(i);
+    delay(100);
+   }
+   
+  for (i=255; i!=155; i--) {
+    myMotor->setSpeed(i);  
+    myOtherMotor->setSpeed(i);
+    delay(100);
+   }
+   **/
+
+   /** John's 90 degree turn 
   turnToAngle(90);
   delay(1000);
   turnToAngle(-90);
   delay(1000);
   Serial.print("tock");
+  **/
 
-  //myMotor->run(BACKWARD);
-  //myOtherMotor->run(BACKWARD);
-  //for (i=155; i<255; i++) {
-   // myMotor->setSpeed(i);  
-   // myOtherMotor->setSpeed(i);
-   // delay(100);
-  //}
-  //for (i=255; i!=155; i--) {
-  //  myMotor->setSpeed(i);  
-   // myOtherMotor->setSpeed(i);
-   // delay(100);
-  //}
-
-  Serial.print("tech");
+  //Serial.print("tech");
   //myMotor->run(RELEASE);
   //myOtherMotor->run(RELEASE);
-  delay(1000);
+
+  distance = 100;
 }
+
 void turnToAngle(int angle)
 {
-  if (angle > 0)
-  {
+  if (angle > 0) {
     myMotor->run(BACKWARD);
     myOtherMotor->run(FORWARD);
-  }
-  else
-  {
+  } else {
     myMotor->run(FORWARD);
     myOtherMotor->run(BACKWARD);
   }
+  
   myMotor->setSpeed(255);
   myOtherMotor->setSpeed(255);
   delay(10.5 * abs(angle));

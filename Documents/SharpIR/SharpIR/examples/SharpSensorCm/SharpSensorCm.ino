@@ -17,15 +17,10 @@ SharpIR sharp(ir, 25, 93, model);
 
 
 
-void setup(){
-  
+void setup() { 
   Serial.begin(9600);
   pinMode (ir, INPUT);
-  
 }
-
-
-
 
 
 void loop(){
@@ -36,9 +31,6 @@ void loop(){
   
 
   unsigned long pepe1=millis();  // takes the time before the loop on the library begins
-  
-  
-
   int dis=sharp.distance();  // this returns the distance to the object you're measuring
 
 
