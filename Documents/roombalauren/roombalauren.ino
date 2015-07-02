@@ -4,21 +4,17 @@
 #include <Servo.h>
 //#include <SharpIR.h>
 #include <Wire.h>
-#include < Adafruit_MotorShield.h >
+
 #include "utility/Adafruit_PWMServoDriver.h"
 
 //For sensing from the front
 const int frontTrigPin = 11;
-const int frontEchoPin = 13;
+const int frontEchoPin = 13; 
 
 //#define ir A0 //the pin where the sensor is attached??
 //#define model 1080 //model: 1080 for GP2Y0A21Y, 20150 for GP2Y0A02Y
 
 //SharpIR sharp(ir, 25, 93, model);
-
-
-
-long duration;
 
 //Servo object to control servo
 Servo myservo;
@@ -36,6 +32,7 @@ Adafruit_DCMotor *myMotor = AFMS.getMotor(2);
 // You can also make another motor on port M2
 Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(3);
 
+long distance, duration;
 
 void setup() {
   // put your setup code here, to run once:
@@ -69,21 +66,23 @@ void setup() {
 }
 
 void loop() {
+
   delay(3000);
   goToCloseWall(315);
   turnRight(945); //turn 90 degrees when at closest wall
-  circumnavigate(25);
+  //circumnavigate(25);
   
   while(1);
   
 }
 
+/**
 //takes in the max distance from the wall that the 
 //device should go
 //this assumes all walls are 90 degrees
 void circumnavigate(int dist){
   //must look at these conditions
-  while(distFromLeftWall() < dist && cmToWall() > 15){
+  while (distFromLeftWall() < dist && cmToWall() > 15){
     moveForward();
   }
   if(distFromFrontWall() < distance){
@@ -94,6 +93,7 @@ void circumnavigate(int dist){
   }
   circumnavigate(dist);
 }
+**/
 
 /*Rotates at most 360 degrees 
   and checks the distance to the wall every 
@@ -106,8 +106,7 @@ void goToCloseWall(int del){
   
   //Find angle that provides min distance
   int i = 0;
-  int minDis = cmToWall();
-  distanceMsg();  
+  int minDis = cmToWall();  
   int minSec = 0;
   while(i < 3780){ //go around in circle
     turnRight(del);
@@ -202,11 +201,13 @@ int cmToWall(){
   delayMicroseconds(10);
   digitalWrite(frontTrigPin, LOW);
 
-  duration = pulseIn(FrontEchoPin, HIGH);
+  duration = pulseIn(frontEchoPin, HIGH);
 
   //do we need a delay?
   //delay(1000);
-  
-  return duration/59; //conversion from ms to cm 
+
+  distance = duration/59; //converstion from ms to cm
+  return distance;
+
 }
 
