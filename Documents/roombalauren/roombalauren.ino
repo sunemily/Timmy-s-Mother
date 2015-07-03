@@ -8,8 +8,8 @@
 #include "utility/Adafruit_PWMServoDriver.h"
 
 //For sensing from the front
-const int frontTrigPin = 11;
-const int frontEchoPin = 13; 
+const int frontTrigPin = 2;
+const int frontEchoPin = 6; 
 
 //#define ir A0 //the pin where the sensor is attached??
 //#define model 1080 //model: 1080 for GP2Y0A21Y, 20150 for GP2Y0A02Y
@@ -28,7 +28,7 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 // Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); 
 
 // Select which 'port' M1, M2, M3 or M4. In this case, M1
-Adafruit_DCMotor *myMotor = AFMS.getMotor(2);
+Adafruit_DCMotor *myMotor = AFMS.getMotor(1);
 // You can also make another motor on port M2
 Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(3);
 
@@ -67,6 +67,7 @@ void setup() {
 
 void loop() {
 
+  myservo.write(90);
   delay(3000);
   goToCloseWall(315);
   turnRight(945); //turn 90 degrees when at closest wall
@@ -190,10 +191,12 @@ void turnToAngle(int angle)
   myMotor->setSpeed(0);
   myOtherMotor->setSpeed(0);
 }
+
+
 //if the decimal points are really different, I don't think it
 //is worth checking in another function.
 int cmToWall(){
-  myservo.write(0); //face forward
+  myservo.write(90); //face forward
   delay(100);
   digitalWrite(frontTrigPin, LOW);
   delayMicroseconds(2);
