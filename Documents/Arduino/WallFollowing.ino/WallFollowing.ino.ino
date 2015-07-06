@@ -22,7 +22,8 @@ void loop() {
   delay(10000);
   myServo.write(90); delay(100);
   int startDistance = llGetDistanceAverage(5);
-  int difference = 0;
+  int maxSpeed = 155;
+  int difference = 0; int buffer; int bufferFactor = 10;
   myLeftMotor->run(FORWARD);
   myRightMotor->run(FORWARD);
   while (1)
@@ -30,19 +31,19 @@ void loop() {
     Serial.println(difference);
     delay(10);
     difference = startDistance - llGetDistanceAverage(5);
-    int buffer = abs(difference / 8);
+    int buffer = abs(difference);
     if (difference > 5){
-       myLeftMotor->setSpeed(155);
+       myLeftMotor->setSpeed(max(maxSpeed, bufferFactor * buffer));
        myRightMotor->setSpeed(0);
       Serial.println("First");
     }
     else if (difference < -5){
-       myRightMotor->setSpeed(155);
+       myRightMotor->setSpeed(max(maxSpeed, bufferFactor * buffer));
        myLeftMotor->setSpeed(0);
        Serial.println("Second");
     }
     else {
-      moveForward(155);
+      moveForward(maxSpeed);
       Serial.println("Third");   
     }
   }
