@@ -31,15 +31,13 @@ void loop() {
     Serial.println(difference);
     delay(10);
     difference = startDistance - llGetDistanceAverage(5);
-    int buffer = abs(difference);
+    buffer = abs(difference);
     if (difference > 5){
-       myLeftMotor->setSpeed(max(maxSpeed, bufferFactor * buffer));
-       myRightMotor->setSpeed(0);
+       turnWithGivenSpeeds(maxSpeed - buffer*bufferFactor, maxSpeed);
       Serial.println("First");
     }
     else if (difference < -5){
-       myRightMotor->setSpeed(max(maxSpeed, bufferFactor * buffer));
-       myLeftMotor->setSpeed(0);
+      turnWithGivenSpeeds(maxSpeed, maxSpeed - buffer*bufferFactor);
        Serial.println("Second");
     }
     else {
@@ -106,6 +104,14 @@ void turnRight(int angle)
     myLeftMotor->run(FORWARD);
     delay(5 * abs(angle));
     myLeftMotor->setSpeed(0);
+}
+void turnWithGivenSpeeds(int leftSpeed, int rightSpeed)
+{
+  myLeftMotor->run(FORWARD);
+  myRightMotor->run(FORWARD);
+  myLeftMotor->setSpeed(leftSpeed);
+  myRightMotor->setSpeed(rightSpeed);
+  
 }
 void stop()
 {
