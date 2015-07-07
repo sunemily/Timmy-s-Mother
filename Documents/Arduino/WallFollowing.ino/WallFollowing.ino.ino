@@ -1,4 +1,4 @@
-#include <Wire.h>
+#include <Wire.h> 
 #include <Adafruit_MotorShield.h>
 #include <Servo.h>
 #include <I2C.h>
@@ -8,8 +8,8 @@ Adafruit_DCMotor *myRightMotor = AFMS.getMotor(3);
 Adafruit_DCMotor *myLeftMotor = AFMS.getMotor(1);
 Servo myServo;
 const int servoPin = 9;
-const int trigPin = 2;
-const int echoPin = 6;
+//const int trigPin = 2;
+//const int echoPin = 6;
 char LIDARLite_ADDRESS = 0x62;
 
 void setup() {
@@ -19,30 +19,37 @@ void setup() {
   myServo.attach(servoPin);
 }
 void loop() {
-  delay(10000);
-  myServo.write(90); delay(100);
+  delay(5000);
+  myServo.write(0);
+  delay(1000);
+  for (int i = 0; i <= 180; i+= 1) {myServo.write(i); Serial.print(llGetDistance()); Serial.print(", "); Serial.println(i); delay(60);}
+  Serial.println("Servo at 180");
   int startDistance = llGetDistanceAverage(5);
   int maxSpeed = 155;
-  int difference = 0; int buffer; int bufferFactor = 10;
-  myLeftMotor->run(FORWARD);
-  myRightMotor->run(FORWARD);
-  while (1)
+  int difference = 0;
+  int buffer; int bufferFactor = 10;
+  moveForward(maxSpeed);
+  Serial.println("Motors forward");
+  while (1) //run this forever
   {
-    Serial.println(difference);
+    //Serial.println(difference);
     delay(10);
-    difference = startDistance - llGetDistanceAverage(5);
+    difference = startDistance - llGetDistanceAverage(5); //update difference
     buffer = abs(difference);
-    if (difference > 5){
+    if (difference < -5) //if the robot is too far away from the wall...
+    {
        turnWithGivenSpeeds(maxSpeed - buffer*bufferFactor, maxSpeed);
-      Serial.println("First");
+      //Serial.println("First");
     }
-    else if (difference < -5){
+    else if (difference > 5) //if the robot is too close to the wall
+    {
       turnWithGivenSpeeds(maxSpeed, maxSpeed - buffer*bufferFactor);
-       Serial.println("Second");
+       //Serial.println("Second");
     }
-    else {
+    else //do this as the default
+    {
       moveForward(maxSpeed);
-      Serial.println("Third");   
+      //Serial.println("Third");   
     }
   }
 }
@@ -54,14 +61,14 @@ void moveBackward(int distance, int speed)
 {
   
 }
-void moveForward(int speed)
+void moveForward(int speed) //moves the robot forward at a given speed.
 {
   myLeftMotor->setSpeed(speed);
   myRightMotor->setSpeed(speed);
   myLeftMotor->run(FORWARD);
   myRightMotor->run(FORWARD);
 }
-void moveBackward(int speed)
+void moveBackward(int speed) //moves the robot backward at a given speed.
 {
   myLeftMotor->setSpeed(speed);
   myRightMotor->setSpeed(speed);
@@ -69,7 +76,7 @@ void moveBackward(int speed)
   myRightMotor->run(BACKWARD);
 }
 
-void turnRightInPlace(int angle)
+void turnRightInPlace(int angle) // turns to the right about the center of the wheels of the robot.
 {
     myRightMotor->setSpeed(255);
     myLeftMotor->setSpeed(255);
@@ -79,7 +86,7 @@ void turnRightInPlace(int angle)
     myRightMotor->setSpeed(0);
     myLeftMotor->setSpeed(0);
 }
-void turnLeftInPlace(int angle)
+void turnLeftInPlace(int angle) // turns to the left about the center of the wheels of the robot.
 {
     myRightMotor->setSpeed(255);
     myLeftMotor->setSpeed(255);
@@ -89,15 +96,14 @@ void turnLeftInPlace(int angle)
     myRightMotor->setSpeed(0);
     myLeftMotor->setSpeed(0);
 }
-void turnLeft(int angle)
-{
+void turnLeft(int angle){ //turns to the left about the left wheel
     myRightMotor->setSpeed(255);
     myLeftMotor->setSpeed(0);
     myRightMotor->run(FORWARD);
     delay(5 * abs(angle));
     myRightMotor->setSpeed(0);
 }
-void turnRight(int angle)
+void turnRight(int angle) //turns to the right about the right wheel.
 {
     myLeftMotor->setSpeed(255);
     myRightMotor->setSpeed(0);
@@ -105,15 +111,17 @@ void turnRight(int angle)
     delay(5 * abs(angle));
     myLeftMotor->setSpeed(0);
 }
-void turnWithGivenSpeeds(int leftSpeed, int rightSpeed)
+void turnWithGivenSpeeds(int leftSpeed, int rightSpeed) //turn each motor at its specified speed.
 {
   myLeftMotor->run(FORWARD);
   myRightMotor->run(FORWARD);
   myLeftMotor->setSpeed(leftSpeed);
   myRightMotor->setSpeed(rightSpeed);
-  
+  Serial.println(leftSpeed);
+  Serial.println(rightSpeed);
+  delay(5000);
 }
-void stop()
+void stop() //stops both motors
 {
   myRightMotor->run(RELEASE);
   myLeftMotor->run(RELEASE);
