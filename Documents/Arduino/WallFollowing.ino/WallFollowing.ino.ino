@@ -23,6 +23,8 @@ void loop() {
   myServo.write(0);
   delay(1000);
   //for (int i = 0; i <= 180; i+= 1) {myServo.write(i); Serial.print(llGetDistance()); Serial.print(", "); Serial.println(i); delay(60);}
+
+  goToClosestWall();
   Serial.println("Servo at 180");
   int startDistance = llGetDistanceAverage(5);
   int maxSpeed = 155;
@@ -65,6 +67,23 @@ void loop() {
   */
   
 }
+
+void goToClosestWall(){
+  minAngle = getAngleWithMinDistance(5);
+  if(minAngle < 90){
+    turnRight(90-minAngle);
+  }
+  else{
+    turnLeft(minAngle-90);
+  }
+  distToWall = llGetDistance();
+  moveForward(100);
+  while(llGetDistance() > 15){
+    delay(10);
+  }
+  turnRightInPlace(90);
+}
+
 void moveForward(int distance, int speed)
 {
   
@@ -141,13 +160,19 @@ void stop() //stops both motors
 int getAngleWithMinDistance(int numReadings)
 {
   int increment = 180 / numReadings;
-  int max = 0; int maxAngle = 0; int val;
-  for (int i = 0; i <= 180; i += increment)
+  int minD = llGetDistance(); 
+  int minAngle = 0; 
+  int val;
+  for (int i = increment; i <= 180; i += increment)
   {
-    val = llGetDistance();
-    if (val > max) {max = val; maxAngle = i;} 
+    myServo.write(i);
+    val= llGetDistance();
+    if (val < minD) {
+      minD = val; 
+      minAngle = i;
+    } 
   }
-  return maxAngle;
+  return minAngle;
 }
 // Write a register and wait until it responds with success
 void llWriteAndWait(char myAddress, char myValue){
