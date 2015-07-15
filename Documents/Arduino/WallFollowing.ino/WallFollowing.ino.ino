@@ -16,9 +16,19 @@ void setup() {
   myServo.attach(servoPin);
 }
 void loop() {
+<<<<<<< HEAD
   initialize(); //Test to make sure everything is running.  Includes delay to make sure user is ready.
  // Serial.println("Working");
   goToClosestWall(20);
+=======
+  delay(5000);
+  myServo.write(0);
+  delay(1000);
+  //for (int i = 0; i <= 180; i+= 1) {myServo.write(i); Serial.print(llGetDistance()); Serial.print(", "); Serial.println(i); delay(60);}
+  Serial.println("Going to closest wall");
+  goToClosestWall();
+  Serial.println("Finished closest wall.  Servo at 180");
+>>>>>>> origin/master
   int startDistance = llGetDistanceAverage(5);
   int difference = 0;
   int buffer; int bufferFactor = 10;
@@ -162,6 +172,8 @@ void stop() //stops both motors
   myRightMotor->run(RELEASE);
   myLeftMotor->run(RELEASE);
 }
+
+
 int getAngleWithMinDistance(int numReadings)
 {
   int increment = 180 / numReadings;
@@ -174,6 +186,7 @@ int getAngleWithMinDistance(int numReadings)
     delay(1000);
     myServo.write(i);
     val= llGetDistance();
+<<<<<<< HEAD
     if (val != 0 && val < minD) {
       minD = val; 
       minAngle = i;
@@ -183,6 +196,19 @@ int getAngleWithMinDistance(int numReadings)
     //serial.println(val);
   }
   //serial.println(minAngle);
+=======
+    
+    if (val < minD) {
+      minD = val; 
+      minAngle = i;
+    } 
+    Serial.print(i);
+    Serial.print(", ");
+    Serial.println(val);
+  }
+  Serial.print("Min angle is ");
+  Serial.println(minAngle);
+>>>>>>> origin/master
   return minAngle;
 }
 // Write a register and wait until it responds with success
