@@ -4,14 +4,11 @@
 #include <I2C.h>
 #include "utility/Adafruit_PWMServoDriver.h"
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
-Adafruit_DCMotor *myRightMotor = AFMS.getMotor(3);
-Adafruit_DCMotor *myLeftMotor = AFMS.getMotor(1);
+Adafruit_DCMotor *myRightMotor = AFMS.getMotor(3); Adafruit_DCMotor *myLeftMotor = AFMS.getMotor(1);
 Servo myServo;
 const int servoPin = 9;
-//const int trigPin = 2;
-//const int echoPin = 6;
+const int maxSpeed = 155;
 char LIDARLite_ADDRESS = 0x62;
-
 void setup() {
   Serial.begin(9600);
   AFMS.begin();  // create with the default frequency 1.6KHz
@@ -19,40 +16,35 @@ void setup() {
   myServo.attach(servoPin);
 }
 void loop() {
-  delay(5000);
-  myServo.write(0);
-  delay(1000);
-  //for (int i = 0; i <= 180; i+= 1) {myServo.write(i); Serial.print(llGetDistance()); Serial.print(", "); Serial.println(i); delay(60);}
-
-  goToClosestWall();
-  Serial.println("Servo at 180");
+  initialize(); //Test to make sure everything is running.  Includes delay to make sure user is ready.
+ // Serial.println("Working");
+  goToClosestWall(20);
   int startDistance = llGetDistanceAverage(5);
-  int maxSpeed = 155;
   int difference = 0;
   int buffer; int bufferFactor = 10;
   moveForward(maxSpeed);
-  Serial.println("Motors forward");
-   //Version 1:
+  //serial.println("Motors forward");
+  //Version 1:
   while (1) //run this forever
   {
-    //Serial.println(difference);
+    ////serial.println(difference);
     delay(10);
     difference = startDistance - llGetDistanceAverage(5); //update difference
     buffer = abs(difference);
     if (difference < -5) //if the robot is too far away from the wall...
     {
        turnWithGivenSpeeds(maxSpeed - buffer*bufferFactor, maxSpeed);
-      //Serial.println("First");
+      ////serial.println("First");
     }
     else if (difference > 5) //if the robot is too close to the wall
     {
       turnWithGivenSpeeds(maxSpeed, maxSpeed - buffer*bufferFactor);
-       //Serial.println("Second");
+       ////serial.println("Second");
     }
     else //do this as the default
     {
       moveForward(maxSpeed);
-      //Serial.println("Third");   
+      ////serial.println("Third");   
     }
   }
   
@@ -68,22 +60,35 @@ void loop() {
   
 }
 
-void goToClosestWall(){
-  minAngle = getAngleWithMinDistance(5);
-  if(minAngle < 90){
-    turnRight(90-minAngle);
+void goToClosestWall(int numReadings)
+{
+  int minAngle = getAngleWithMinDistance(numReadings);
+  if(minAngle < 90)
+  {
+    turnRightInPlace(90-minAngle);
   }
-  else{
-    turnLeft(minAngle-90);
+  else
+  {
+    turnLeftInPlace(minAngle-90);
   }
-  distToWall = llGetDistance();
-  moveForward(100);
+  myServo.write(90);
+  delay(200);
+  int distToWall = llGetDistance();
+  moveForward(155);
   while(llGetDistance() > 15){
     delay(10);
   }
-  turnRightInPlace(90);
+  //turnRightInPlace(90);
 }
-
+void initialize()
+{
+  delay(5000);
+  myServo.write(0);
+  delay(200);
+  myServo.write(180);
+  delay(200);
+  myServo.write(90);
+}
 void moveForward(int distance, int speed)
 {
   
@@ -148,8 +153,8 @@ void turnWithGivenSpeeds(int leftSpeed, int rightSpeed) //turn each motor at its
   myRightMotor->run(FORWARD);
   myLeftMotor->setSpeed(leftSpeed);
   myRightMotor->setSpeed(rightSpeed);
-  Serial.println(leftSpeed);
-  Serial.println(rightSpeed);
+  //serial.println(leftSpeed);
+  //serial.println(rightSpeed);
   delay(5000);
 }
 void stop() //stops both motors
@@ -160,18 +165,24 @@ void stop() //stops both motors
 int getAngleWithMinDistance(int numReadings)
 {
   int increment = 180 / numReadings;
-  int minD = llGetDistance(); 
+  //serial.println(increment);
+  int minD = 1000000;
   int minAngle = 0; 
   int val;
-  for (int i = increment; i <= 180; i += increment)
+  for (int i = 0; i <= 180; i += increment)
   {
+    delay(1000);
     myServo.write(i);
     val= llGetDistance();
-    if (val < minD) {
+    if (val != 0 && val < minD) {
       minD = val; 
       minAngle = i;
     } 
+        //serial.print(i);
+        //serial.print(" ,");
+    //serial.println(val);
   }
+  //serial.println(minAngle);
   return minAngle;
 }
 // Write a register and wait until it responds with success
