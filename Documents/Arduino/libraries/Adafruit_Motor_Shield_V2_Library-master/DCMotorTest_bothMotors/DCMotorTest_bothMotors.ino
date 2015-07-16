@@ -1,4 +1,4 @@
-<<<<<<< Updated upstream
+//<<<<<<< Updated upstream
 #include <Adafruit_MotorShield.h>
 #include <Wire.h>
 #include "utility/Adafruit_PWMServoDriver.h"
@@ -127,7 +127,7 @@ void turnToAngle(int angle)
   myOtherMotor->setSpeed(0);
 }
 
-=======
+//=======
 /* 
 This is a test sketch for the Adafruit assembled Motor Shield for Arduino v2
 It won't work with v1.x motor shields! Only for the v2's with built in PWM
